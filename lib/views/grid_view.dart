@@ -1,8 +1,14 @@
+/// This file contains the [GridGraph] widget and [_GridPainter] custom painter class.
+/// The [GridGraph] widget is a stateless widget that plots a grid and points on a canvas.
+/// The [_GridPainter] custom painter class is used to draw the grid and points on the canvas.
+/// The [_GridPainter] class extends the [CustomPainter] class and overrides the [paint] and [shouldRepaint] methods.
+/// The [paint] method is responsible for drawing the grid and points on the canvas.
+/// The [shouldRepaint] method is responsible for determining whether the canvas should be repainted.
 import 'package:flutter/material.dart';
 
 class GridGraph extends StatelessWidget {
+  // Points to be plotted on the graph.
   final List<List<double>> points;
-
   const GridGraph({super.key, required this.points});
 
   @override
@@ -10,9 +16,13 @@ class GridGraph extends StatelessWidget {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         return Container(
+          // Margin around the container.
           margin: const EdgeInsets.all(50.0),
+          // CustomPaint widget used for drawing custom designs.
           child: CustomPaint(
+            // Setting size of the CustomPaint based on parent constraints.
             size: Size(constraints.maxWidth, constraints.maxHeight),
+            // Custom painter class for drawing the grid and points.
             painter: _GridPainter(points: points),
           ),
         );
