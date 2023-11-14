@@ -35,6 +35,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromRGBO(155, 190, 200, 1),
       body: GridGraph(points: [[1,20], [10,30], [80,80], [99,99], [33,24]],)
     );
   }

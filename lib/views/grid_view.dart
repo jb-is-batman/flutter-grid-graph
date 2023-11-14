@@ -19,6 +19,7 @@ class GridGraph extends StatelessWidget {
           // Margin around the container.
           margin: const EdgeInsets.all(50.0),
           // CustomPaint widget used for drawing custom designs.
+          color: Color.fromRGBO(22, 72, 99, 1),
           child: CustomPaint(
             // Setting size of the CustomPaint based on parent constraints.
             size: Size(constraints.maxWidth, constraints.maxHeight),
@@ -39,7 +40,7 @@ class _GridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint     = Paint()
-      ..color       = Colors.grey
+      ..color       = Color.fromRGBO(66, 125, 157, 1)
       ..strokeWidth = 0.5;
 
     final stepX = size.width / 100;
@@ -53,7 +54,7 @@ class _GridPainter extends CustomPainter {
     }
 
     final blackPaint  = Paint()
-      ..color         = Colors.black
+      ..color         = Color.fromRGBO(66, 125, 157, 1)
       ..strokeWidth   = 1.0;
 
     for (double i = 0; i <= 100; i += 10) {
@@ -64,7 +65,7 @@ class _GridPainter extends CustomPainter {
     }
 
     final redPaint =   Paint()
-      ..color       = Colors.red
+      ..color       = Color.fromRGBO(155, 190, 200, 1)
       ..strokeWidth = 2.0
       ..style       = PaintingStyle.stroke;
 
@@ -83,18 +84,46 @@ class _GridPainter extends CustomPainter {
     );
 
     for (var point in points) {
+      // Create a TextSpan with larger font size, different text and background color.
       textPainter.text = TextSpan(
         text: '(${point[0]},${point[1]})',
-        style: const TextStyle(color: Colors.black, fontSize: 12.0, backgroundColor: Colors.white),
+        style: TextStyle(
+          color: Color.fromRGBO(22, 72, 99, 1), // Change text color here
+          fontSize: 12.0, // Increase font size
+          backgroundColor: Color.fromRGBO(221, 242, 253, 1), // Change background color here
+        ),
       );
 
+      // Layout the textPainter to get the size of the text.
       textPainter.layout();
-      textPainter.paint(canvas, Offset(point[0] * stepX, size.height - point[1] * stepY - textPainter.height));
+
+      // Calculate the position for the text.
+      Offset textPosition = Offset(point[0] * stepX - 10, size.height - point[1] * stepY - textPainter.height - 10);
+
+      // Calculate the rectangle bounds for the background.
+      Rect backgroundRect = Rect.fromLTWH(
+        textPosition.dx - 5, // Left padding
+        textPosition.dy - 5, // Top padding
+        textPainter.width + 10, // Right padding
+        textPainter.height + 10, // Bottom padding
+      );
+
+      // Define the corner radius for the rounded rectangle.
+      const double cornerRadius = 8.0;
+
+      // Draw the rounded background rectangle.
+      canvas.drawRRect(
+        RRect.fromRectXY(backgroundRect, cornerRadius, cornerRadius),
+        Paint()..color = Color.fromRGBO(221, 242, 253, 1),
+      );
+
+      // Draw the text.
+      textPainter.paint(canvas, textPosition);
     }
 
     final axisTextPainter = TextPainter(
-  textDirection: TextDirection.ltr,
-);
+      textDirection: TextDirection.ltr,
+    );
 
 // Draw labels for horizontal axis steps
 for (double i = 0; i <= 100; i += 10) {
