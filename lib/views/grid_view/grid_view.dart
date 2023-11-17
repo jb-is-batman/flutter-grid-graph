@@ -5,37 +5,41 @@
 /// The [paint] method is responsible for drawing the grid and points on the canvas.
 /// The [shouldRepaint] method is responsible for determining whether the canvas should be repainted.
 import 'package:flutter/material.dart';
+import 'package:flutter_grid_graph/app/baseview/baseview.dart';
+import 'package:flutter_grid_graph/models/coordinate_model.dart';
+import 'package:flutter_grid_graph/views/grid_view/grid_viewmodel.dart';
 
 class GridGraph extends StatelessWidget {
-  // Points to be plotted on the graph.
-  final List<List<double>> points;
-  const GridGraph({super.key, required this.points});
 
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        return Container(
-          // Margin around the container.
-          margin: const EdgeInsets.all(50.0),
-          // CustomPaint widget used for drawing custom designs.
-          color: const Color.fromRGBO(22, 72, 99, 1),
-          child: CustomPaint(
-            // Setting size of the CustomPaint based on parent constraints.
-            size: Size(constraints.maxWidth, constraints.maxHeight),
-            // Custom painter class for drawing the grid and points.
-            painter: _GridPainter(points: points),
-          ),
-        );
-      },
-    );
-  }
+	@override
+	Widget build(BuildContext context) {
+		return BaseView<GridViewModel>(builder: (context, model, child) {
+				return LayoutBuilder(
+						builder: (BuildContext context, BoxConstraints constraints) {
+						return Container(
+							// Margin around the container.
+							margin: const EdgeInsets.all(50.0),
+							// CustomPaint widget used for drawing custom designs.
+							color: const Color.fromRGBO(22, 72, 99, 1),
+							child: CustomPaint(
+								// Setting size of the CustomPaint based on parent constraints.
+								size: Size(constraints.maxWidth, constraints.maxHeight),
+								// Custom painter class for drawing the grid and points.
+								painter: _GridPainter(gridViewModel: model),
+							),
+						);
+					},
+				);
+			}
+		);
+	}
+
 }
 
 class _GridPainter extends CustomPainter {
-  final List<List<double>> points;
+  final GridViewModel gridViewModel;
 
-  _GridPainter({required this.points});
+  _GridPainter({required this.gridViewModel});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -70,16 +74,16 @@ class _GridPainter extends CustomPainter {
       ..style       = PaintingStyle.stroke;
 
     final path = Path()
-      ..moveTo(points[0][0] * stepX, size.height - points[0][1] * stepY);
+      ..moveTo(gridViewModel.coordinates[0].x * stepX, size.height - gridViewModel.coordinates[0].y * stepY);
 
-    for (var i = 1; i < points.length; i++) {
-      path.lineTo(points[i][0] * stepX, size.height - points[i][1] * stepY);
+    for (var i = 1; i < gridViewModel.coordinates.length; i++) {
+      path.lineTo(gridViewModel.coordinates[i].x * stepX, size.height - gridViewModel.coordinates[i].y * stepY);
     }
 
     path.close();
     canvas.drawPath(path, coordinatePathPaint);
 
-    _drawCoordinateLabels(canvas, size, points, stepX, stepY);
+    _drawCoordinateLabels(canvas, size, gridViewModel.coordinates, stepX, stepY);
 
     _drawAxisLabels(canvas, size, stepX, stepY);
   }
@@ -87,7 +91,7 @@ class _GridPainter extends CustomPainter {
   @override
   bool shouldRepaint(CustomPainter oldDelegate) => true;
 
-  void _drawCoordinateLabels(Canvas canvas, Size size, List<List<double>> coordinates, double stepX, double stepY) {
+  void _drawCoordinateLabels(Canvas canvas, Size size, List<CoordinateModel> coordinates, double stepX, double stepY) {
     final textPainter = TextPainter(
       textDirection: TextDirection.ltr,
     );
@@ -95,7 +99,7 @@ class _GridPainter extends CustomPainter {
     for (var coordinate in coordinates) {
       // Create a TextSpan with larger font size, different text and background color.
       textPainter.text = TextSpan(
-        text: '(${coordinate[0]},${coordinate[1]})',
+        text: '(${coordinate.x},${coordinate.y})',
         style: const TextStyle(
           color: Color.fromRGBO(22, 72, 99, 1), // Change text color here
           fontSize: 12.0, // Increase font size
@@ -107,7 +111,7 @@ class _GridPainter extends CustomPainter {
       textPainter.layout();
 
       // Calculate the position for the text.
-      Offset textPosition = Offset(coordinate[0] * stepX - 10, size.height - coordinate[1] * stepY - textPainter.height - 10);
+      Offset textPosition = Offset(coordinate.x * stepX - 10, size.height - coordinate.y * stepY - textPainter.height - 10);
 
       // Calculate the rectangle bounds for the background.
       Rect backgroundRect = Rect.fromLTWH(
