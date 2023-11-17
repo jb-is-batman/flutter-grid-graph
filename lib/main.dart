@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_grid_graph/views/grid_view.dart';
+import 'package:flutter_grid_graph/app/locator.dart';
+import 'package:flutter_grid_graph/views/grid_view/grid_view.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  setupLocator();
   runApp(const MyApp());
 }
 
@@ -35,9 +38,29 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    int _counter = 0;
+    int test = _counter.hashCode;
     return Scaffold(
       backgroundColor: Color.fromRGBO(155, 190, 200, 1),
-      body: GridGraph(points: [[20,40], [30,70], [50,80], [80,60], [50,10]],)
+      body: Row(
+        children: [
+          Expanded(
+            flex: 1,
+            child: ListView.builder(
+              itemCount: 30,
+              itemBuilder: (BuildContext context, int index) {
+                return ListTile(
+                  title: Text('Item $index'),
+                );
+              },
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: GridGraph(),
+          ),
+        ],
+      ),
     );
   }
 }
