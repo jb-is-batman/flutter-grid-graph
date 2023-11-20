@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_grid_graph/app/locator.dart';
+import 'package:flutter_grid_graph/core/locator.dart';
 import 'package:flutter_grid_graph/views/grid_view/grid_view.dart';
 
 void main() async {

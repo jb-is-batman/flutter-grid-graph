@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_grid_graph/app/baseview/baseview_model.dart';
-import 'package:flutter_grid_graph/app/locator.dart';
+import 'package:flutter_grid_graph/core/baseview/baseview_model.dart';
+import 'package:flutter_grid_graph/core/locator.dart';
 import 'package:provider/provider.dart';
 
 

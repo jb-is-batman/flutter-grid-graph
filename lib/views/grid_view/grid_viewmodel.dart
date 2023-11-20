@@ -1,19 +1,25 @@
-import 'package:flutter_grid_graph/app/baseview/baseview_model.dart';
+import 'package:flutter_grid_graph/core/baseview/baseview_model.dart';
+import 'package:flutter_grid_graph/core/locator.dart';
 import 'package:flutter_grid_graph/models/coordinate_model.dart';
+import 'package:flutter_grid_graph/models/grid_model.dart';
+import 'package:flutter_grid_graph/services/graph_service.dart';
 
 class GridViewModel extends BaseViewModel {
-  	final List<CoordinateModel> _coordinates = [
-		CoordinateModel(x: 20, y: 20),
-		CoordinateModel(x: 30, y: 30),
-		CoordinateModel(x: 40, y: 40),
-		CoordinateModel(x: 50, y: 50),
 
-	]; 
+	final GraphService _coordinateService = locator<GraphService>();
 
-  	List<CoordinateModel> get coordinates => _coordinates;
+	List<CoordinateModel> _coordinates = [];
+  	List<CoordinateModel> get coordinates => _coordinates; 
+	GridModel				get gridModel => _coordinateService.getGridModel();
+
+	Future<void> getCoordinates() async {
+		setState(ViewState.busy);
+		_coordinates = await _coordinateService.getCoordinates();
+		setState(ViewState.idle);
+	}
 
 	addCoordinate(x, y) {
-		_coordinates.add(CoordinateModel(x: x, y: y));
+		_coordinateService.addCoordinate(x, y, null);
 		notifyListeners();
 	}
 }
