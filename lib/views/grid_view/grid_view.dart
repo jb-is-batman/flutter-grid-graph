@@ -57,15 +57,15 @@ class _GridPainter extends CustomPainter {
       canvas.drawLine(Offset(i * stepX, 0), Offset(i * stepX, size.height), paint);
     }
 
-    final gridLinePaintPaint  = Paint()
+    final gridLinePaint  = Paint()
       ..color         = const Color.fromRGBO(66, 125, 157, 1)
       ..strokeWidth   = 1.0;
 
     for (double i = 0; i <= 100; i += 10) {
       // Draw horizontal grid lines
-      canvas.drawLine(Offset(0, size.height - i * stepY), Offset(size.width, size.height - i * stepY), gridLinePaintPaint);
+      canvas.drawLine(Offset(0, size.height - i * stepY), Offset(size.width, size.height - i * stepY), gridLinePaint);
       // Draw vertical grid lines
-      canvas.drawLine(Offset(i * stepX, 0), Offset(i * stepX, size.height), gridLinePaintPaint);
+      canvas.drawLine(Offset(i * stepX, 0), Offset(i * stepX, size.height), gridLinePaint);
     }
 
     final coordinatePathPaint =   Paint()
