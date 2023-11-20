@@ -5,7 +5,8 @@
 /// The [paint] method is responsible for drawing the grid and points on the canvas.
 /// The [shouldRepaint] method is responsible for determining whether the canvas should be repainted.
 import 'package:flutter/material.dart';
-import 'package:flutter_grid_graph/app/baseview/baseview.dart';
+import 'package:flutter_grid_graph/core/baseview/baseview.dart';
+import 'package:flutter_grid_graph/core/baseview/baseview_model.dart';
 import 'package:flutter_grid_graph/models/coordinate_model.dart';
 import 'package:flutter_grid_graph/views/grid_view/grid_viewmodel.dart';
 
@@ -13,15 +14,17 @@ class GridGraph extends StatelessWidget {
 
 	@override
 	Widget build(BuildContext context) {
-		return BaseView<GridViewModel>(builder: (context, model, child) {
+		return BaseView<GridViewModel>(
+			onModelReady: (GridViewModel model) => model.getCoordinates(),
+			builder: (context, model, child) {
 				return LayoutBuilder(
-						builder: (BuildContext context, BoxConstraints constraints) {
+					builder: (BuildContext context, BoxConstraints constraints) {
 						return Container(
 							// Margin around the container.
 							margin: const EdgeInsets.all(50.0),
 							// CustomPaint widget used for drawing custom designs.
 							color: const Color.fromRGBO(22, 72, 99, 1),
-							child: CustomPaint(
+							child: CustomPaint(	
 								// Setting size of the CustomPaint based on parent constraints.
 								size: Size(constraints.maxWidth, constraints.maxHeight),
 								// Custom painter class for drawing the grid and points.
@@ -33,7 +36,6 @@ class GridGraph extends StatelessWidget {
 			}
 		);
 	}
-
 }
 
 class _GridPainter extends CustomPainter {
@@ -43,18 +45,18 @@ class _GridPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint     = Paint()
-      ..color       = const Color.fromRGBO(66, 125, 157, 1)
-      ..strokeWidth = 0.5;
+	final paint     = Paint()
+		..color       = const Color.fromRGBO(66, 125, 157, 1)
+		..strokeWidth = 0.5;
 
     final stepX = size.width / 100;
     final stepY = size.height / 100;
 
     for (double i = 0; i <= 100; i += 1) {
-      // Draw horizontal grid lines
-      canvas.drawLine(Offset(0, size.height - i * stepY), Offset(size.width, size.height - i * stepY), paint);
-      // Draw vertical grid lines
-      canvas.drawLine(Offset(i * stepX, 0), Offset(i * stepX, size.height), paint);
+		// Draw horizontal grid lines
+		canvas.drawLine(Offset(0, size.height - i * stepY), Offset(size.width, size.height - i * stepY), paint);
+		// Draw vertical grid lines
+		canvas.drawLine(Offset(i * stepX, 0), Offset(i * stepX, size.height), paint);
     }
 
     final gridLinePaint  = Paint()
@@ -62,34 +64,40 @@ class _GridPainter extends CustomPainter {
       ..strokeWidth   = 1.0;
 
     for (double i = 0; i <= 100; i += 10) {
-      // Draw horizontal grid lines
-      canvas.drawLine(Offset(0, size.height - i * stepY), Offset(size.width, size.height - i * stepY), gridLinePaint);
-      // Draw vertical grid lines
-      canvas.drawLine(Offset(i * stepX, 0), Offset(i * stepX, size.height), gridLinePaint);
+		// Draw horizontal grid lines
+		canvas.drawLine(Offset(0, size.height - i * stepY), Offset(size.width, size.height - i * stepY), gridLinePaint);
+		// Draw vertical grid lines
+		canvas.drawLine(Offset(i * stepX, 0), Offset(i * stepX, size.height), gridLinePaint);
     }
 
-    final coordinatePathPaint =   Paint()
-      ..color       = const Color.fromRGBO(155, 190, 200, 1)
-      ..strokeWidth = 2.0
-      ..style       = PaintingStyle.stroke;
+	if(gridViewModel.state != ViewState.busy) {
+		_drawCoordinates(canvas, size, gridViewModel.coordinates, stepX, stepY);
+		_drawCoordinateLabels(canvas, size, gridViewModel.coordinates, stepX, stepY);
+	}
 
-    final path = Path()
-      ..moveTo(gridViewModel.coordinates[0].x * stepX, size.height - gridViewModel.coordinates[0].y * stepY);
-
-    for (var i = 1; i < gridViewModel.coordinates.length; i++) {
-      path.lineTo(gridViewModel.coordinates[i].x * stepX, size.height - gridViewModel.coordinates[i].y * stepY);
-    }
-
-    path.close();
-    canvas.drawPath(path, coordinatePathPaint);
-
-    _drawCoordinateLabels(canvas, size, gridViewModel.coordinates, stepX, stepY);
-
-    _drawAxisLabels(canvas, size, stepX, stepY);
+	_drawAxisLabels(canvas, size, stepX, stepY);
   }
 
   @override
   bool shouldRepaint(CustomPainter oldDelegate) => true;
+
+	void _drawCoordinates(Canvas canvas, Size size, List<CoordinateModel> coordinates, double stepX, double stepY) {
+
+		final coordinatePathPaint =   Paint()
+			..color       = const Color.fromRGBO(155, 190, 200, 1)
+			..strokeWidth = 2.0
+			..style       = PaintingStyle.stroke;
+
+		final path = Path()
+			..moveTo(gridViewModel.coordinates[0].x * stepX, size.height - gridViewModel.coordinates[0].y * stepY);
+
+		for (var i = 1; i < gridViewModel.coordinates.length; i++) {
+			path.lineTo(gridViewModel.coordinates[i].x * stepX, size.height - gridViewModel.coordinates[i].y * stepY);
+		}
+
+		path.close();
+		canvas.drawPath(path, coordinatePathPaint);
+	}
 
   void _drawCoordinateLabels(Canvas canvas, Size size, List<CoordinateModel> coordinates, double stepX, double stepY) {
     final textPainter = TextPainter(

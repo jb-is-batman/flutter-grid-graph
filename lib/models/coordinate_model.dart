@@ -4,5 +4,5 @@ class CoordinateModel {
   double y;
   String? label;
 
-  CoordinateModel({required this.x, required this.y});
+  CoordinateModel({required this.x, required this.y, this.label});
 }
