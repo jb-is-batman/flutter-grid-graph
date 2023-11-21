@@ -19,8 +19,7 @@ class GraphService {
 		CoordinateModel(x: 120, y: 9500),
 	]; 
 
-	Future<List<CoordinateModel>>  getCoordinates() async
-	{
+	Future<List<CoordinateModel>>  getCoordinates() async {
 		return _coordinates;
 	}
 

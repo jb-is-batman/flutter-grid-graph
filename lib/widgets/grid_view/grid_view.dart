@@ -1,17 +1,11 @@
-/// This file contains the [GridGraph] widget and [_GridPainter] custom painter class.
-/// The [GridGraph] widget is a stateless widget that plots a grid and points on a canvas.
-/// The [_GridPainter] custom painter class is used to draw the grid and points on the canvas.
-/// The [_GridPainter] class extends the [CustomPainter] class and overrides the [paint] and [shouldRepaint] methods.
-/// The [paint] method is responsible for drawing the grid and points on the canvas.
-/// The [shouldRepaint] method is responsible for determining whether the canvas should be repainted.
 import 'package:flutter/material.dart';
 import 'package:flutter_grid_graph/core/baseview/baseview.dart';
 import 'package:flutter_grid_graph/core/baseview/baseview_model.dart';
 import 'package:flutter_grid_graph/models/coordinate_model.dart';
-import 'package:flutter_grid_graph/views/grid_view/grid_viewmodel.dart';
+import 'package:flutter_grid_graph/widgets/grid_view/grid_viewmodel.dart';
 
 class GridGraph extends StatelessWidget {
-
+	const GridGraph({super.key});
 	@override
 	Widget build(BuildContext context) {
 		return BaseView<GridViewModel>(
@@ -19,16 +13,21 @@ class GridGraph extends StatelessWidget {
 			builder: (context, model, child) {
 				return LayoutBuilder(
 					builder: (BuildContext context, BoxConstraints constraints) {
-						return Container(
-							// Margin around the container.
-							margin: const EdgeInsets.all(50.0),
-							// CustomPaint widget used for drawing custom designs.
-							color: const Color.fromRGBO(22, 72, 99, 1),
-							child: CustomPaint(	
+						return GestureDetector(
+							onTapDown: (TapDownDetails details) {
+								_onCanvasTap(context, details, constraints, model);
+							},
+							child: Container(
+								// Margin around the container.
+								// margin: const EdgeInsets.all(50.0),
+								// CustomPaint widget used for drawing custom designs.
+								color: const Color.fromRGBO(22, 72, 99, 1),
+								child: CustomPaint(	
 								// Setting size of the CustomPaint based on parent constraints.
-								size: Size(constraints.maxWidth, constraints.maxHeight),
-								// Custom painter class for drawing the grid and points.
-								painter: _GridPainter(gridViewModel: model),
+									size: Size(constraints.maxWidth, constraints.maxHeight),
+									// Custom painter class for drawing the grid and points.
+									painter: _GridPainter(gridViewModel: model),
+								),
 							),
 						);
 					},
@@ -36,6 +35,19 @@ class GridGraph extends StatelessWidget {
 			}
 		);
 	}
+
+	void _onCanvasTap(BuildContext context, TapDownDetails details, BoxConstraints constraints, GridViewModel model) {
+		final RenderBox renderBox 		= context.findRenderObject() as RenderBox;
+		final Offset 	localPosition	= renderBox.globalToLocal(details.globalPosition);
+		final Size 		size 			= Size(constraints.maxWidth, constraints.maxHeight);
+
+		final double 	stepX 			= size.width / (model.gridModel.xBottom.max - model.gridModel.xBottom.min);
+		final double	stepY 			= size.height / (model.gridModel.yLeft.max - model.gridModel.yLeft.min);
+		final double 	realX			= model.getRealX(localPosition.dx, stepX);
+		final double 	realY 			= model.getRealY(localPosition.dy, stepY, size.height);
+		Offset graphCoordinates 		= Offset(realX, realY);
+		model.addCoordinate(graphCoordinates.dx, graphCoordinates.dy);
+  }
 }
 
 class _GridPainter extends CustomPainter {
@@ -46,8 +58,8 @@ class _GridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
 
-	final stepX = size.width / (gridViewModel.gridModel.xBottom.max - gridViewModel.gridModel.xBottom.min);
-	final stepY = size.height / (gridViewModel.gridModel.yLeft.max - gridViewModel.gridModel.yLeft.min);
+	final stepX = gridViewModel.getStepX(width: size.width);
+	final stepY = gridViewModel.getStepY(height: size.height);
 
 	final gridLinePaint = Paint()
 	..color = const Color.fromRGBO(66, 125, 157, 0.5)
@@ -78,15 +90,15 @@ class _GridPainter extends CustomPainter {
 
 	// Method to convert real-world values to canvas coordinates
 	Offset toCanvasCoordinates(double xValue, double yValue, Size size, double stepX, double stepY) {
-		double xPos = (xValue - gridViewModel.gridModel.xBottom.min) * stepX;
-		double yPos = size.height - (yValue - gridViewModel.gridModel.yLeft.min) * stepY;
+		double xPos = gridViewModel.getCanvasX(xValue, stepX);
+		double yPos = gridViewModel.getCanvasY(yValue, stepY, size.height);
 		return Offset(xPos, yPos);
 	}
 
 	// Method to convert canvas coordinates to real-world values
 	Offset fromCanvasCoordinates(double xCanvas, double yCanvas, Size size, double stepX, double stepY) {
-		double xValue = xCanvas / stepX + gridViewModel.gridModel.xBottom.min;
-		double yValue = (size.height - yCanvas) / stepY + gridViewModel.gridModel.yLeft.min;
+		double xValue = gridViewModel.getRealX(xCanvas, stepX);
+		double yValue = gridViewModel.getRealY(yCanvas, stepY, size.height);
 		return Offset(xValue, yValue);
 	}
 
@@ -116,7 +128,7 @@ class _GridPainter extends CustomPainter {
 		for (var coordinate in coordinates) {
 			// Create a TextSpan with larger font size, different text and background color.
 			textPainter.text = TextSpan(
-				text: '(${coordinate.x},${coordinate.y})',
+				text: '(${coordinate.x.round()},${coordinate.y.round()})',
 				style: const TextStyle(
 					color: Color.fromRGBO(22, 72, 99, 1),
 					fontSize: 12.0,
@@ -152,8 +164,6 @@ class _GridPainter extends CustomPainter {
 			textPainter.paint(canvas, textPosition);
 		}
 	}
-
-
 
 	void _drawAxisLabels(Canvas canvas, Size size, double stepX, double stepY) {
 		final axisTextPainter = TextPainter(

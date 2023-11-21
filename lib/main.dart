@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_grid_graph/core/locator.dart';
-import 'package:flutter_grid_graph/views/grid_view/grid_view.dart';
+import 'package:flutter_grid_graph/widgets/grid_view/grid_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -57,7 +57,10 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           Expanded(
             flex: 3,
-            child: GridGraph(),
+            child: Padding(
+              padding: const EdgeInsets.all(30.0),
+              child: GridGraph(),
+            ),
           ),
         ],
       ),
