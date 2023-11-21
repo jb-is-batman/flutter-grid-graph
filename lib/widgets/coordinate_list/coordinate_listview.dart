@@ -12,12 +12,17 @@ class CoordinateListView extends StatelessWidget {
 			builder: (context, model, child) {
 				return LayoutBuilder(
 					builder: (BuildContext context, BoxConstraints constraints) {
-						return ListView.builder(
+						return ReorderableListView.builder(
+							onReorder: (oldIndex, newIndex) {
+								model.reorder(oldIndex, newIndex);
+							},
 							itemCount: model.coordinates.length,
 							itemBuilder: (context, index) {
 								return Card(
+									key: Key('$index'),
 									child: ListTile(
-										title: Text("X: ${model.coordinates[index].x.round()} Y: ${model.coordinates[index].y.round()}"),
+										key: Key('$index'),
+										title: Text("${index + 1} (${model.coordinates[index].x.round()}, ${model.coordinates[index].y.round()})"),
 									),
 								);
 							},

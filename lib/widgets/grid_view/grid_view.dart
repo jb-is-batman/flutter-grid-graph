@@ -128,10 +128,11 @@ class _GridPainter extends CustomPainter {
 			textDirection: TextDirection.ltr,
 		);
 
-		for (var coordinate in coordinates) {
+
+		for (int i = 0 ; i < coordinates.length  ; i++) {
 			// Create a TextSpan with larger font size, different text and background color.
 			textPainter.text = TextSpan(
-				text: '(${coordinate.x.round()},${coordinate.y.round()})',
+				text: '${i + 1} (${coordinates[i].x.round()},${coordinates[i].y.round()})',
 				style: const TextStyle(
 					color: Color.fromRGBO(22, 72, 99, 1),
 					fontSize: 12.0,
@@ -143,7 +144,7 @@ class _GridPainter extends CustomPainter {
 			textPainter.layout();
 
 			// Use toCanvasCoordinates to calculate the position for the text.
-			Offset canvasPosition = toCanvasCoordinates(coordinate.x, coordinate.y, size, stepX, stepY);
+			Offset canvasPosition = toCanvasCoordinates(coordinates[i].x, coordinates[i].y, size, stepX, stepY);
 			Offset textPosition = Offset(canvasPosition.dx - 10, canvasPosition.dy - textPainter.height - 10);
 
 			// Calculate the rectangle bounds for the background.

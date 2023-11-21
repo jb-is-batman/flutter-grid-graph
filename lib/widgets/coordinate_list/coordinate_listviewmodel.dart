@@ -25,6 +25,15 @@ class CoordinateListViewModel extends BaseViewModel {
 		setState(ViewState.idle);
 	}
 	
+  void reorder(int oldIndex, int newIndex) {
+    if (newIndex > oldIndex) {
+      newIndex -= 1;
+    }
+    final CoordinateModel item = _coordinates.removeAt(oldIndex);
+    _coordinates.insert(newIndex, item);
+    notifyListeners();
+  }
+
 	@override
 	void dispose() {
 		_coordinateService.removeListener(_onCoordinateServiceUpdated);
