@@ -1,7 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_grid_graph/models/coordinate_model.dart';
 import 'package:flutter_grid_graph/models/grid_model.dart';
 
-class GraphService {
+class GraphService extends ChangeNotifier{
 
 	GridModel getGridModel() {
 		return GridModel(
@@ -15,8 +16,8 @@ class GraphService {
   	final List<CoordinateModel> _coordinates = [
 		CoordinateModel(x: 80, y: 2000),
 		CoordinateModel(x: 90, y: 3500),
-		CoordinateModel(x: 110, y: 6000),
-		CoordinateModel(x: 120, y: 9500),
+		CoordinateModel(x: 100, y: 7000),
+		CoordinateModel(x: 140, y: 9500),
 	]; 
 
 	Future<List<CoordinateModel>>  getCoordinates() async {
@@ -25,5 +26,6 @@ class GraphService {
 
 	addCoordinate(double x, double y, String? label) {
 		_coordinates.add(CoordinateModel(x: x, y: y, label: label));
+		notifyListeners();
 	}
 }

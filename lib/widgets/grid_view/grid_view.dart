@@ -117,6 +117,9 @@ class _GridPainter extends CustomPainter {
 			path.lineTo(point.dx, point.dy);
 		}
 
+		// Close the path
+		// path.close();
+
 		canvas.drawPath(path, coordinatePathPaint);
 	}
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_grid_graph/core/locator.dart';
+import 'package:flutter_grid_graph/widgets/coordinate_list/coordinate_listview.dart';
 import 'package:flutter_grid_graph/widgets/grid_view/grid_view.dart';
 
 void main() async {
@@ -38,27 +39,22 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    int _counter = 0;
-    int test = _counter.hashCode;
-    return Scaffold(
+    
+    return const Scaffold(
       backgroundColor: Color.fromRGBO(155, 190, 200, 1),
       body: Row(
         children: [
           Expanded(
             flex: 1,
-            child: ListView.builder(
-              itemCount: 30,
-              itemBuilder: (BuildContext context, int index) {
-                return ListTile(
-                  title: Text('Item $index'),
-                );
-              },
+            child: Padding(
+              padding: EdgeInsets.all(30.0),
+              child: CoordinateListView(),
             ),
           ),
           Expanded(
             flex: 3,
             child: Padding(
-              padding: const EdgeInsets.all(30.0),
+              padding: EdgeInsets.all(30.0),
               child: GridGraph(),
             ),
           ),
