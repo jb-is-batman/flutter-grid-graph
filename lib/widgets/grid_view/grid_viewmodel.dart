@@ -6,9 +6,8 @@ import 'package:flutter_grid_graph/services/graph_service.dart';
 
 class GridViewModel extends BaseViewModel {
 
-	final GraphService _coordinateService = locator<GraphService>();
-
-	List<CoordinateModel> 	_coordinates = [];
+	final GraphService _coordinateService	= locator<GraphService>();
+	List<CoordinateModel> 	_coordinates	= [];
   	List<CoordinateModel> 	get coordinates => _coordinates; 
 	GridModel				get gridModel 	=> _coordinateService.getGridModel();
 

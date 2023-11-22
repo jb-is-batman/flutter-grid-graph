@@ -52,7 +52,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
           Expanded(
-            flex: 3,
+            flex: 2,
             child: Padding(
               padding: EdgeInsets.all(30.0),
               child: GridGraph(),

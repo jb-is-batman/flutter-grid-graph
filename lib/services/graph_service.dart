@@ -24,8 +24,27 @@ class GraphService extends ChangeNotifier{
 		return _coordinates;
 	}
 
-	addCoordinate(double x, double y, String? label) {
+	void addCoordinate(double x, double y, String? label) {
 		_coordinates.add(CoordinateModel(x: x, y: y, label: label));
 		notifyListeners();
 	}
+
+  void deleteCoordinate(int index) {
+    _coordinates.removeAt(index);
+    notifyListeners();
+  }
+
+  void updateCoordinate(int index, double x, double y, String? label) {
+    _coordinates[index] = CoordinateModel(x: x, y: y, label: label);
+    notifyListeners();
+  }
+
+  void reorder(int oldIndex, int newIndex) {
+    if (newIndex > oldIndex) {
+      newIndex -= 1;
+    }
+    final CoordinateModel item = _coordinates.removeAt(oldIndex);
+    _coordinates.insert(newIndex, item);
+    notifyListeners();
+  }
 }
