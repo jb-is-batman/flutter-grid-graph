@@ -20,7 +20,7 @@ class CoordinateListViewModel extends BaseViewModel {
 		notifyListeners();
 	}
 
-	void saveUpdatedCoordinate(double x, double y, String? label, int index) {
+	void saveUpdatedCoordinate(int index, double x, double y, String? label) {
 		_coordinateService.updateCoordinate(index, x, y, label);
 	}
 

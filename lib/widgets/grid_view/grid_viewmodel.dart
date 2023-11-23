@@ -6,15 +6,23 @@ import 'package:flutter_grid_graph/services/graph_service.dart';
 
 class GridViewModel extends BaseViewModel {
 
-	final GraphService _coordinateService	= locator<GraphService>();
-	List<CoordinateModel> 	_coordinates	= [];
+	final GraphService 		_coordinateService	= locator<GraphService>();
+	List<CoordinateModel> 	_coordinates		= [];
+	bool   					_closePath			= false;
+
   	List<CoordinateModel> 	get coordinates => _coordinates; 
 	GridModel				get gridModel 	=> _coordinateService.getGridModel();
+	bool   					get closePath 	=> _closePath;
 
 	Future<void> getCoordinates() async {
 		setState(ViewState.busy);
 		_coordinates = await _coordinateService.getCoordinates();
 		setState(ViewState.idle);
+	}
+
+	void toggleClosePath() {
+		_closePath = !_closePath;
+		notifyListeners();
 	}
 
 	addCoordinate(x, y) {

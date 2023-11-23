@@ -118,8 +118,8 @@ class _GridPainter extends CustomPainter {
 		}
 
 		// Close the path
-		// path.close();
-
+		if(gridViewModel.closePath) path.close();
+		
 		canvas.drawPath(path, coordinatePathPaint);
 	}
 

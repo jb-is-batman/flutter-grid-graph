@@ -9,6 +9,19 @@ class CoordinateListView extends StatelessWidget {
   Widget build(BuildContext context) {
 	late List<TextEditingController> xControllers;
 	late List<TextEditingController> yControllers;
+	late List<TextEditingController> labelControllers;
+	InputDecoration txtInputDecorationX = const InputDecoration(
+		contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+		labelText: 'X',
+	);
+	InputDecoration txtInputDecorationY = const InputDecoration(
+		contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+		labelText: 'Y'
+	);
+	InputDecoration txtInputDecorationLabel = const InputDecoration(
+		contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+		labelText: 'Label'
+	);
 
     return BaseView<CoordinateListViewModel>(
 			onModelReady: (CoordinateListViewModel model) async {
@@ -18,6 +31,9 @@ class CoordinateListView extends StatelessWidget {
 					.toList();
 				yControllers = model.coordinates
 					.map((coordinate) => TextEditingController(text: '${coordinate.y.round()}'))
+					.toList();
+				labelControllers = model.coordinates
+					.map((coordinate) => TextEditingController(text: coordinate.label ?? ""))
 					.toList();
 			},
 			builder: (context, model, child) {
@@ -36,64 +52,76 @@ class CoordinateListView extends StatelessWidget {
 									newIndex -= 1;
 								}
 								// Dispose and recreate controllers for the reordered items
-								TextEditingController oldXController = xControllers.removeAt(oldIndex);
-								TextEditingController oldYController = yControllers.removeAt(oldIndex);
+								TextEditingController oldXController 		= xControllers.removeAt(oldIndex);
+								TextEditingController oldYController 		= yControllers.removeAt(oldIndex);
+								TextEditingController oldLabelController	= labelControllers.removeAt(oldIndex);
+								
 								oldXController.dispose();
 								oldYController.dispose();
+								oldLabelController.dispose();
 								
-								TextEditingController newXController = TextEditingController(text: '${model.coordinates[newIndex].x.round()}');
-								TextEditingController newYController = TextEditingController(text: '${model.coordinates[newIndex].y.round()}');
+								TextEditingController newXController 		= TextEditingController(text: '${model.coordinates[newIndex].x.round()}');
+								TextEditingController newYController 		= TextEditingController(text: '${model.coordinates[newIndex].y.round()}');
+								TextEditingController newLabelController	= TextEditingController(text: '${model.coordinates[newIndex].label}');
 								
 								xControllers.insert(newIndex, newXController);
 								yControllers.insert(newIndex, newYController);
+								labelControllers.insert(newIndex, newLabelController);
 							},
 							itemCount: model.coordinates.length,
 							itemBuilder: (context, index) {
 								if(index >= xControllers.length) {
 									xControllers.add(TextEditingController(text: '${model.coordinates[index].x.round()}'));
 									yControllers.add(TextEditingController(text: '${model.coordinates[index].y.round()}'));
+									labelControllers.add(TextEditingController(text: model.coordinates[index].label ?? ""));
 								}
 								
-								xControllers[index].text = '${model.coordinates[index].x.round()}';
-								yControllers[index].text = '${model.coordinates[index].y.round()}';
+								xControllers[index].text 				= '${model.coordinates[index].x.round()}';
+								yControllers[index].text 				= '${model.coordinates[index].y.round()}';
+								labelControllers[index].text			= model.coordinates[index].label ?? "";
 								
-								TextEditingController xController = xControllers[index];
-								TextEditingController yController = yControllers[index];
+								TextEditingController xController 		= xControllers[index];
+								TextEditingController yController 		= yControllers[index];
+								TextEditingController labelController 	= labelControllers[index];
 								return Card(
-								key: Key('$index'),
+								key: Key('c-$index'),
 								child: ListTile(
-									key: Key('$index'),
+									key: Key('lt-$index'),
 									leading: CircleAvatar(
 										child: Text("${index + 1}"),
 									),
 									title: Row(
 										mainAxisSize: MainAxisSize.min,
 									  	children: [
-
-											// Text("x: ${model.coordinates[index].x.round()}"),
 											Expanded(
 												child: TextField(
 													key: ValueKey('x-$index'), // Unique key for x TextField
-													readOnly: !model.isEditingList[index],
+													enabled: model.isEditingList[index],
 													controller: xController,
-													onChanged: (value) => xController.text = value,
-													decoration: const InputDecoration(
-														labelText: 'X',
-													),
+													// onChanged: (value) => xController.text = value,
+													decoration: txtInputDecorationX
 												),
 											),
+											Container(width: 5,),
 											Expanded(
 												child: TextField(
 													key: ValueKey('y-$index'), // Unique key for y TextField
-													readOnly: !model.isEditingList[index],
+													enabled: model.isEditingList[index],
 													controller: yController,
-													onChanged: (value) => xController.text = value,
-													decoration: const InputDecoration(
-														labelText: 'Y',
-													),
+													// onChanged: (value) => yController.text = value,
+													decoration: txtInputDecorationY
 												),
 											),
-											// Text("y: ${model.coordinates[index].y.round()}"),
+											Container(width: 5,),
+											Expanded(
+												child: TextField(
+													key: ValueKey('label-$index'), // Unique key for y TextField
+													enabled: model.isEditingList[index],
+													controller: labelController,
+													// onChanged: (value) => yController.text = value,
+													decoration: txtInputDecorationLabel,
+												),
+											),
 										],
 									),
 									trailing: model.isEditingList[index] ? Row(
@@ -102,16 +130,18 @@ class CoordinateListView extends StatelessWidget {
 										IconButton(
 									    	icon: const Icon(Icons.check, color: Colors.green, size: 18),
 									    	onPressed: () {
-									    		// model.saveUpdatedCoordinate(index);
+									    		model.saveUpdatedCoordinate(index, double.parse(xController.text), double.parse(yController.text), labelController.text);
 									    	},
 									    ),
 									    IconButton(
 									    	icon: const Icon(Icons.delete, color: Colors.red, size: 18),
 									    	onPressed: () {
-												TextEditingController oldXController = xControllers.removeAt(index);
-												TextEditingController oldYController = yControllers.removeAt(index);
+												TextEditingController oldXController 		= xControllers.removeAt(index);
+												TextEditingController oldYController 		= yControllers.removeAt(index);
+												TextEditingController oldLabelController	= labelControllers.removeAt(index);
 												oldXController.dispose();
 												oldYController.dispose();
+												oldLabelController.dispose();
 									    		model.deleteCoordinate(index);
 									    	},
 									    ),
@@ -120,7 +150,10 @@ class CoordinateListView extends StatelessWidget {
 										},
 										child: const Text("Cancel"))
 									  ],
-									) : IconButton(onPressed: () => model.toggleEdit(index), icon: const Icon(Icons.edit, size: 18,)),
+									) : IconButton(onPressed: () {
+										model.disableAllEdit();
+										model.toggleEdit(index);
+									}, icon: const Icon(Icons.edit, size: 18,)),
 								),
 								);
 							},
